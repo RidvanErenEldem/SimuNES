@@ -109,4 +109,65 @@ public class Cpu
         absoluteMemoryAddress = (ushort)((highByte << 8) | lowByte);
         return 0;
     }
+
+    private byte AbsoluteXAddressing()
+    {
+        byte lowByte = bus.Read(ProgramCounter);
+        ProgramCounter++;
+        byte highByte = bus.Read(ProgramCounter);
+        ProgramCounter++;
+
+        ushort baseAddress = (ushort)((highByte << 8) | lowByte);
+        absoluteMemoryAddress = (ushort)(baseAddress + XIndexRegister);
+
+        // Check for page crossing
+        if ((absoluteMemoryAddress & 0xFF00) != (baseAddress & 0xFF00))
+            return 1;
+        return 0;
+    }
+
+    private byte AbsoluteYAddressing()
+    {
+        byte lowByte = bus.Read(ProgramCounter);
+        ProgramCounter++;
+        byte highByte = bus.Read(ProgramCounter);
+        ProgramCounter++;
+
+        ushort baseAddress = (ushort)((highByte << 8) | lowByte);
+        absoluteMemoryAddress = (ushort)(baseAddress + YIndexRegister);
+
+        // Check for page crossing
+        if ((absoluteMemoryAddress & 0xFF00) != (baseAddress & 0xFF00))
+            return 1;
+        return 0;
+    }
+
+    private byte ZeroPageXAddressing()
+    {
+        // Read the zero page address
+        byte zeroPageAddress = bus.Read(ProgramCounter);
+        ProgramCounter++;
+
+        // Add X register and wrap around within the zero page
+        absoluteMemoryAddress = (ushort)((zeroPageAddress + XIndexRegister) & 0x00FF);
+
+        // No additional cycles for zero page indexed addressing
+        return 0;
+    }
+
+    private byte ZeroPageYAddressing()
+    {
+        // Read the zero page address
+        byte zeroPageAddress = bus.Read(ProgramCounter);
+        ProgramCounter++;
+
+        // Add Y register and wrap around within the zero page
+        // Note: Zero Page Y addressing is less common but exists for some instructions.
+        // For example, LDX (Zero Page, Y) is a valid instruction.
+        // The logic is identical to ZeroPageXAddressing for the address calculation.
+        absoluteMemoryAddress = (ushort)((zeroPageAddress + YIndexRegister) & 0x00FF);
+
+        // No additional cycles for zero page indexed addressing
+        return 0;
+    }
 }
