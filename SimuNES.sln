@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimuNES.Core", "SimuNES.Core\SimuNES.Core.csproj", "{84D2FE04-3471-4081-8309-AAF4C63FEF4F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimuNES.Testing", "SimuNES.Testing\SimuNES.Testing.csproj", "{4727BEFD-7E18-4373-A727-1D4A7A7AC6F4}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{84D2FE04-3471-4081-8309-AAF4C63FEF4F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{84D2FE04-3471-4081-8309-AAF4C63FEF4F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{84D2FE04-3471-4081-8309-AAF4C63FEF4F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{84D2FE04-3471-4081-8309-AAF4C63FEF4F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4727BEFD-7E18-4373-A727-1D4A7A7AC6F4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4727BEFD-7E18-4373-A727-1D4A7A7AC6F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4727BEFD-7E18-4373-A727-1D4A7A7AC6F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4727BEFD-7E18-4373-A727-1D4A7A7AC6F4}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
