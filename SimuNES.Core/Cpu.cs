@@ -170,4 +170,28 @@ public class Cpu
         // No additional cycles for zero page indexed addressing
         return 0;
     }
+
+    private byte IndirectAddressing()
+    {
+        byte lowBytePointer = bus.Read(ProgramCounter);
+        ProgramCounter++;
+        byte highBytePointer = bus.Read(ProgramCounter);
+        ProgramCounter++;
+
+        ushort pointerAddress = (ushort)((highBytePointer << 8) | lowBytePointer);
+
+        // 6502 Indirect Addressing Hardware Bug:
+        // If the low byte of the pointer address is 0xFF, the high byte is fetched
+        // from the beginning of the same page, instead of the next page.
+        if ((pointerAddress & 0x00FF) == 0x00FF)
+        {
+            absoluteMemoryAddress = (ushort)((bus.Read((ushort)(pointerAddress & 0xFF00)) << 8) | bus.Read(pointerAddress));
+        }
+        else
+        {
+            absoluteMemoryAddress = (ushort)((bus.Read((ushort)(pointerAddress + 1)) << 8) | bus.Read(pointerAddress));
+        }
+
+        return 0;
+    }
 }
