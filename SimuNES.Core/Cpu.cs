@@ -279,4 +279,23 @@ public class Cpu
         absoluteMemoryAddress = (ushort)((highByte << 8) | lowByte);
         return 0;
     }
+
+    /// <summary>
+    /// Indirect Indexed (Y) addressing mode.
+    /// Reads a zero page address, uses it to fetch a 16-bit base address, then adds Y register.
+    /// </summary>
+    /// <returns>1 if a page boundary is crossed, otherwise 0</returns>
+    private byte IndirectYAddressing()
+    {
+        byte t = bus.Read(ProgramCounter++);
+
+        byte lowByte = bus.Read(t);
+        byte highByte = bus.Read((ushort)((t + 1) & 0x00FF));
+
+        ushort baseAddress = (ushort)((highByte << 8) | lowByte);
+
+        absoluteMemoryAddress = (ushort)(baseAddress + YIndexRegister);
+
+        return (absoluteMemoryAddress & 0xFF00) != (baseAddress & 0xFF00) ? (byte)1 : (byte)0;
+    }
 }
