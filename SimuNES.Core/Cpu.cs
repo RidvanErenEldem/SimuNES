@@ -4,52 +4,91 @@ using SimuNES.Core.Structs;
 
 namespace SimuNES.Core;
 
-public class Cpu(IBusDevice bus)
+public class Cpu
 {
-    public byte Accumulator, XIndex, YIndex, Status, StackPointer;
+    // CPU Registers
+    public byte AccumulatorRegister, XIndexRegister, YIndexRegister, StatusRegister, StackPointer;
     public ushort ProgramCounter;
-    private byte Opcode = 0x00;
-    private readonly IBusDevice Bus = bus;
-    private Instruction[] lookup = new Instruction[256];
-    public int Cycles = 0;
+
+    // Internal execution state
+    private byte currentOpcode;
+    private ushort absoluteMemoryAddress;
+    private byte fetchedValue;
+    private int remainingCycles;
+    private readonly IBusDevice bus;
+
+    // Opcode lookup table
+    private readonly Instruction[] instructionLookupTable = new Instruction[256];
+
+    public int Cycles => remainingCycles;
+
+    public Cpu(IBusDevice bus)
+    {
+        this.bus = bus;
+    }
+
     public void SetFlag(Flags flag, bool value)
     {
         if (value)
-            Status |= (byte)(1 << (int)flag);
+            StatusRegister |= (byte)(1 << (int)flag);
         else
-            Status &= (byte)~(1 << (int)flag);
+            StatusRegister &= (byte)~(1 << (int)flag);
     }
 
     public bool GetFlag(Flags flag)
     {
-        return (Status & (1 << (int)flag)) != 0;
+        return (StatusRegister & (1 << (int)flag)) != 0;
     }
 
     public void Reset()
     {
-        Accumulator = XIndex = YIndex = 0;
+        AccumulatorRegister = 0;
+        XIndexRegister = 0;
+        YIndexRegister = 0;
+
         StackPointer = 0xFD;
-        Status = 0x24;
+        StatusRegister = 0x24;
 
-        byte low = Bus.Read(0xFFFC);
-        byte high = Bus.Read(0xFFFD);
+        byte resetVectorLow = bus.Read(0xFFFC);
+        byte resetVectorHigh = bus.Read(0xFFFD);
 
-        ProgramCounter = (ushort)((high << 8) | low);
+        ProgramCounter = (ushort)((resetVectorHigh << 8) | resetVectorLow);
+        remainingCycles = 0;
     }
 
     public void Clock()
     {
-        if (Cycles == 0)
+        if (remainingCycles == 0)
         {
-            Opcode = Bus.Read(ProgramCounter);
+            currentOpcode = bus.Read(ProgramCounter);
             ProgramCounter++;
 
             SetFlag(Flags.Unused, true);
+
+            Instruction instruction = instructionLookupTable[currentOpcode];
+            remainingCycles = instruction.Cycles;
+
+            byte additionalCyclesFromAddressingMode = instruction.AddressMode();
+            byte additionalCyclesFromOperation = instruction.Operate();
+
+            remainingCycles += additionalCyclesFromAddressingMode;
+            remainingCycles += additionalCyclesFromOperation;
         }
 
-        if (Cycles > 0)
-        {
-            Cycles--;
-        }
+        remainingCycles--;
+    }
+
+    // Addressing Modes
+
+    private byte ImpliedAddressing()
+    {
+        fetchedValue = AccumulatorRegister;
+        return 0;
+    }
+
+    private byte ImmediateAddressing()
+    {
+        absoluteMemoryAddress = ProgramCounter++;
+        return 0;
     }
 }
