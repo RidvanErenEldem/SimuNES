@@ -91,4 +91,22 @@ public class Cpu
         absoluteMemoryAddress = ProgramCounter++;
         return 0;
     }
+
+    private byte ZeroPageAddressing()
+    {
+        absoluteMemoryAddress = bus.Read(ProgramCounter);
+        ProgramCounter++;
+        absoluteMemoryAddress &= 0x00FF; // Ensure high byte is 0
+        return 0;
+    }
+
+    private byte AbsoluteAddressing()
+    {
+        byte lowByte = bus.Read(ProgramCounter);
+        ProgramCounter++;
+        byte highByte = bus.Read(ProgramCounter);
+        ProgramCounter++;
+        absoluteMemoryAddress = (ushort)((highByte << 8) | lowByte);
+        return 0;
+    }
 }
