@@ -1,5 +1,6 @@
 using SimuNES.Core.Enums;
 using SimuNES.Core.Interfaces;
+using SimuNES.Core.Structs;
 
 namespace SimuNES.Core;
 
@@ -9,6 +10,7 @@ public class Cpu(IBusDevice bus)
     public ushort ProgramCounter;
     private byte Opcode = 0x00;
     private readonly IBusDevice Bus = bus;
+    private Instruction[] lookup = new Instruction[256];
     public int Cycles = 0;
     public void SetFlag(Flags flag, bool value)
     {
